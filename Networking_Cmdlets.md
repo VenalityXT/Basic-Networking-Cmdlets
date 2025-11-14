@@ -27,30 +27,39 @@ This expanded view includes everything the OS knows about each interface: MAC ad
 
 <img width="684" height="480" alt="ipconfig all" src="https://github.com/user-attachments/assets/6eb174a9-530c-4329-b3f4-c293ae22ed33" />
 
-### Releasing the DHCP Lease (ipconfig /release)
-```PowerShell  
+### Releasing and Renewing the DHCP Lease  
+XPowerShell  
 ipconfig /release  
-```  
+ipconfig /renew  
+X  
 
-Initially, the release attempt failed. Windows displayed:  
+When I attempted to refresh the system’s network configuration by releasing and renewing the DHCP lease, Windows immediately pushed back with an error:
+
 **“The operation failed as no adapter is in the state permissible for this operation.”**
 
-This error revealed that DHCP was disabled on the Ethernet interface. Using Windows’ built-in Network Troubleshooter successfully re-enabled DHCP, after which the release operation worked normally—an excellent real-world example of diagnosing and fixing environmental configuration issues.
+This happened during the release attempt:
 
 <img width="539" height="113" alt="ipconfig release" src="https://github.com/user-attachments/assets/65d1c3bd-81e6-4871-ba94-9518480f7d87" />
 
-<img width="521" height="186" alt="ipconfig release FI```ED" src="https://github.com/user-attachments/assets/704cc8b4-7f26-439f-84f6-d84e91a6a2ad" />
-
-### Requesting a New Lease (ipconfig /renew)
-```PowerShell  
-ipconfig /renew  
-```  
-
-After DHCP was restored, the interface immediately pulled a valid 192.168.x.x address from the router. This command is commonly used to refresh stale or incorrect addressing without requiring a reboot.
+And the renew command wasn’t any more cooperative:
 
 <img width="541" height="110" alt="ipconfig renew" src="https://github.com/user-attachments/assets/429c7ae6-919c-4594-adae-34fa28f007ee" />
 
-<img width="521" height="209" alt="ipconfig renew FI```ED" src="https://github.com/user-attachments/assets/ee33e651-63eb-4043-9f63-643873ca0764" />
+At first glance it looked like a simple permissions issue, but the message was actually pointing to something more interesting:  
+**the Ethernet adapter wasn’t using DHCP at all.**  
+With no DHCP client running on the interface, Windows had nothing to release—and no way to request a new lease.
+
+To correct this, I opened the Windows Network Troubleshooter. The diagnostic immediately detected the problem and automatically re-enabled DHCP on the adapter. Once the interface was properly configured again, the same commands behaved exactly as expected.
+
+Running Xipconfig /releaseX after the fix cleanly dropped the active IP configuration:
+
+<img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/704cc8b4-7f26-439f-84f6-d84e91a6a2ad" />
+
+And Xipconfig /renewX successfully triggered a full DHCP request cycle—resulting in a fresh 192.168.x.x address assignment, updated gateway, and DNS settings:
+
+<img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/ee33e651-63eb-4043-9f63-643873ca0764" />
+
+This sequence highlights the value of reading error messages closely, validating assumptions, and using built-in OS diagnostic tools. It also demonstrates the full DORA workflow in action once DHCP is functioning properly.
 
 ### Connectivity Test (ping)
 ```PowerShell  
