@@ -402,7 +402,7 @@ A quick overview of foundational Layer 1–3 hardware.
 
 ## Hub (Layer 1)
 
-<img width="824" height="608" alt="sprite-1-1" src="https://github.com/user-attachments/assets/cab409ef-fd0c-4970-980d-b32efb438e5d" />
+<img width="787" height="540" alt="sprite-HUB" src="https://github.com/user-attachments/assets/cb5042b5-6c60-4825-941a-d256888fc385" />
 
 - Traffic is repeated to **all** ports  
 - No MAC learning  
