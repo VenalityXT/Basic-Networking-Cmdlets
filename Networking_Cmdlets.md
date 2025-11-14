@@ -10,27 +10,27 @@ More importantly, this project demonstrates the practical skill of interpreting 
 # Windows Networking – Command Usage and Analysis
 
 ### IP Configuration (ipconfig)
-XPowerShell  
+```PowerShell  
 ipconfig  
-X  
+```  
 
 This command delivers a concise snapshot of the system’s current network state—IPv4 address, subnet mask, and default gateway. It’s the fastest way to verify whether a host is configured correctly and actively connected.
 
 <img width="598" height="246" alt="ipconfig" src="https://github.com/user-attachments/assets/e535c7be-c7d2-41de-a285-2abe1f001998" />
 
 ### Full Adapter Details (ipconfig /all)
-XPowerShell  
+```PowerShell  
 ipconfig /all  
-X  
+```  
 
 This expanded view includes everything the OS knows about each interface: MAC addresses, DHCP lease times, DNS servers, interface states, and extended network parameters. It’s the command you use when you need the *why* behind connectivity issues.
 
 <img width="684" height="480" alt="ipconfig all" src="https://github.com/user-attachments/assets/6eb174a9-530c-4329-b3f4-c293ae22ed33" />
 
 ### Releasing the DHCP Lease (ipconfig /release)
-XPowerShell  
+```PowerShell  
 ipconfig /release  
-X  
+```  
 
 Initially, the release attempt failed. Windows displayed:  
 **“The operation failed as no adapter is in the state permissible for this operation.”**
@@ -39,41 +39,41 @@ This error revealed that DHCP was disabled on the Ethernet interface. Using Wind
 
 <img width="539" height="113" alt="ipconfig release" src="https://github.com/user-attachments/assets/65d1c3bd-81e6-4871-ba94-9518480f7d87" />
 
-<img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/704cc8b4-7f26-439f-84f6-d84e91a6a2ad" />
+<img width="521" height="186" alt="ipconfig release FI```ED" src="https://github.com/user-attachments/assets/704cc8b4-7f26-439f-84f6-d84e91a6a2ad" />
 
 ### Requesting a New Lease (ipconfig /renew)
-XPowerShell  
+```PowerShell  
 ipconfig /renew  
-X  
+```  
 
 After DHCP was restored, the interface immediately pulled a valid 192.168.x.x address from the router. This command is commonly used to refresh stale or incorrect addressing without requiring a reboot.
 
 <img width="541" height="110" alt="ipconfig renew" src="https://github.com/user-attachments/assets/429c7ae6-919c-4594-adae-34fa28f007ee" />
 
-<img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/ee33e651-63eb-4043-9f63-643873ca0764" />
+<img width="521" height="209" alt="ipconfig renew FI```ED" src="https://github.com/user-attachments/assets/ee33e651-63eb-4043-9f63-643873ca0764" />
 
 ### Connectivity Test (ping)
-XPowerShell  
+```PowerShell  
 ping 8.8.8.8  
-X  
+```  
 
 ICMP echo requests provide a quick and reliable way to test reachability and latency. Pinging 8.8.8.8 (Google’s DNS server) is a standard troubleshooting step.
 
 <img width="458" height="212" alt="ping" src="https://github.com/user-attachments/assets/50c692d4-e3ef-44ca-8911-58de3fc166a3" />
 
 ### Route Tracing (tracert)
-XPowerShell  
+```PowerShell  
 tracert 8.8.8.8  
-X  
+```  
 
 This command reveals each hop between the host and the destination, showing where delays or failures occur along the path.
 
 <img width="646" height="334" alt="tracert" src="https://github.com/user-attachments/assets/ca729c1f-93df-4637-a811-b8426ec68d3f" />
 
 ### ARP Table Inspection (arp -a)
-XPowerShell  
+```PowerShell  
 arp -a  
-X  
+```  
 
 ARP translates IPv4 addresses into MAC addresses. Viewing this table shows which devices the system has communicated with on the local network.
 
@@ -101,36 +101,36 @@ The ARP table maps IPv4 addresses to MAC addresses. Without it, local-network co
 # Ubuntu Linux Networking – Command Usage and Analysis
 
 ### Interface Listing (ifconfig)
-XBash  
+```Bash  
 ifconfig  
-X  
+```  
 
 Displays the system’s network interfaces, IPv4 configuration, and MAC addresses.
 
 <img width="859" height="629" alt="ubuntu ifconfig" src="https://github.com/user-attachments/assets/c33bf531-7eaf-459a-a671-fa5fc6c0b0b4" />
 
 ### Connectivity Test (ping)
-XBash  
+```Bash  
 ping -c 4 8.8.8.8  
-X  
+```  
 
 Sends four ICMP echo requests to verify basic network connectivity.
 
 <img width="661" height="227" alt="ubuntu ping" src="https://github.com/user-attachments/assets/b52f8124-6cff-4f57-bcbe-c1cbc6cfecd8" />
 
 ### Route Tracing (traceroute)
-XBash  
+```Bash  
 traceroute 8.8.8.8  
-X  
+```  
 
 Shows the routers a packet passes through on its way to the target.
 
 <img width="673" height="732" alt="ubuntu traceroute" src="https://github.com/user-attachments/assets/9850b1e5-ee60-4a69-b820-3fe95db9a974" />
 
 ### ARP Table (arp -a)
-XBash  
+```Bash  
 arp -a  
-X  
+```  
 
 Displays the ARP mappings Linux has learned from local network communication.
 
@@ -141,16 +141,16 @@ Displays the ARP mappings Linux has learned from local network communication.
 # Ubuntu – Additional Networking Tasks
 
 ### MAC Address (ip link)
-XBash  
+```Bash  
 ip link  
-X  
+```  
 
 <img width="1152" height="146" alt="ubuntu ip link" src="https://github.com/user-attachments/assets/a21fc817-5c78-40f2-aab7-dd7cf41d075b" />
 
 ### IP Address (ip addr show)
-XBash  
+```Bash  
 ip addr show  
-X  
+```  
 
 <img width="1019" height="432" alt="ubuntu ip addr show" src="https://github.com/user-attachments/assets/5bb1c38f-0ced-4fff-80f4-e3aaf06583ec" />
 
@@ -160,9 +160,9 @@ Linux’s NetworkManager provides in-depth DHCP details including lease options,
 <img width="912" height="923" alt="ubuntu nmcli device show" src="https://github.com/user-attachments/assets/9033bfc6-f0c3-45bb-b764-3a3170273e69" />
 
 ### DHCP Client Request (dhclient)
-XBash  
+```Bash  
 sudo dhclient -v  
-X  
+```  
 
 [Insert Screenshot – dhclient]
 
