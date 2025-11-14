@@ -28,38 +28,42 @@ This expanded view includes everything the OS knows about each interface: MAC ad
 <img width="684" height="480" alt="ipconfig all" src="https://github.com/user-attachments/assets/6eb174a9-530c-4329-b3f4-c293ae22ed33" />
 
 ### Releasing and Renewing the DHCP Lease  
-XPowerShell  
+```PowerShell  
 ipconfig /release  
 ipconfig /renew  
-X  
+```  
 
-When I attempted to refresh the system’s network configuration by releasing and renewing the DHCP lease, Windows immediately pushed back with an error:
+When I attempted to refresh the VM’s network configuration by releasing and renewing the DHCP lease, Windows immediately pushed back with the same error for both commands:
 
 **“The operation failed as no adapter is in the state permissible for this operation.”**
 
-This happened during the release attempt:
+This showed up during the release attempt:
 
 <img width="539" height="113" alt="ipconfig release" src="https://github.com/user-attachments/assets/65d1c3bd-81e6-4871-ba94-9518480f7d87" />
 
-And the renew command wasn’t any more cooperative:
+And the renew command failed in the exact same way:
 
 <img width="541" height="110" alt="ipconfig renew" src="https://github.com/user-attachments/assets/429c7ae6-919c-4594-adae-34fa28f007ee" />
 
-At first glance it looked like a simple permissions issue, but the message was actually pointing to something more interesting:  
-**the Ethernet adapter wasn’t using DHCP at all.**  
-With no DHCP client running on the interface, Windows had nothing to release—and no way to request a new lease.
+At first, it looked like a Windows-side issue—maybe a permissions problem or a disabled interface. But the error was actually pointing to something deeper:  
+**the VM wasn’t connected to a real LAN segment where DHCP could operate.**  
+VirtualBox had the VM attached to a **NAT** interface, meaning the guest OS wasn’t handling DHCP on the network at all.
 
-To correct this, I opened the Windows Network Troubleshooter. The diagnostic immediately detected the problem and automatically re-enabled DHCP on the adapter. Once the interface was properly configured again, the same commands behaved exactly as expected.
+Switching the VM’s network mode from NAT to **Bridged Adapter** allowed the VM to act like a real device on the local network, making DHCP functional again. After changing this setting and restarting the VM, the adapter finally entered a state where release/renew operations were valid.
 
-Running Xipconfig /releaseX after the fix cleanly dropped the active IP configuration:
+<img width="988" height="474" alt="fixing ipconfig release and renew commands" src="https://github.com/user-attachments/assets/3eb4ca23-a7d3-42bd-b5a5-80640f551b7a" />
+
+Once bridged mode was active, I ran the Windows Network Troubleshooter on the Ethernet interface. The diagnostic tool automatically re-enabled DHCP client functionality, finishing the fix and restoring normal network behavior.
+
+After that, Xipconfig /releaseX cleanly dropped the active lease:
 
 <img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/704cc8b4-7f26-439f-84f6-d84e91a6a2ad" />
 
-And Xipconfig /renewX successfully triggered a full DHCP request cycle—resulting in a fresh 192.168.x.x address assignment, updated gateway, and DNS settings:
+And Xipconfig /renewX successfully acquired a fresh 192.168.x.x address from the router, complete with updated DNS and gateway information:
 
 <img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/ee33e651-63eb-4043-9f63-643873ca0764" />
 
-This sequence highlights the value of reading error messages closely, validating assumptions, and using built-in OS diagnostic tools. It also demonstrates the full DORA workflow in action once DHCP is functioning properly.
+This troubleshooting sequence not only demonstrated the mechanics of DHCP on Windows, but also highlighted an important lesson: when dealing with virtual networks, host-level configuration (like NAT vs. Bridged mode) can directly control how the guest OS interacts with the real network. Once the VM was placed on an actual LAN segment and DHCP was repaired, the entire release/renew workflow behaved exactly as expected.
 
 ### Connectivity Test (ping)
 ```PowerShell  
