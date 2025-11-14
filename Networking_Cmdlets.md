@@ -1,292 +1,159 @@
-# Networking Lab Report  
-Applied Networking Concepts – Windows & Ubuntu
-
-## Overview  
-This report documents a complete set of practical networking tasks performed across Windows and Ubuntu Linux environments.  
-The work includes interacting with the network stack, analyzing configuration details, inspecting ARP and routing behavior, verifying DNS/DHCP functionality, and applying basic networking theory.  
-All tasks were executed in isolated VirtualBox VMs, with screenshots captured to verify each step.
-
----
-
-# Assignment 1 – Applied Networking Concepts (Windows)
-
-## Task: Interact with the Windows networking stack  
-Below are the required networking commands, their purposes, and documented outputs.
-
----
-
-## 1. XipconfigX  
-**Purpose:** Displays basic IP configuration including IPv4, subnet mask, gateway, and adapter state.
-
-**Screenshot:**  
-[Insert Screenshot: Windows – ipconfig]
-
----
-
-## 2. Xipconfig /allX  
-**Purpose:** Provides the full networking configuration, including:  
-- Hostname  
-- MAC address  
-- DHCP status  
-- DHCP lease information  
-- DNS servers  
-- Adapter details  
-- Autoconfiguration settings  
-
-**Screenshot:**  
-[Insert Screenshot: Windows – ipconfig /all]
-
----
-
-## 3. Xipconfig /releaseX  
-**Purpose:** Attempts to release the system’s DHCP lease.  
-
-### Notes on Behavior  
-Initially, the VM returned:  
-*“The operation failed as no adapter is in the state permissible for this operation.”*  
-This occurred because the Ethernet interface had DHCP disabled at the host level.  
-The Windows troubleshooter automatically re-enabled DHCP for the adapter, after which the release command worked as expected.
-
-**Screenshot (before fix):**  
-[Insert Screenshot: Windows – release error]
-
-**Screenshot (after fix):**  
-[Insert Screenshot: Windows – release successful]
-
----
-
-## 4. Xipconfig /renewX  
-**Purpose:** Requests a new DHCP address from the DHCP server.  
-After DHCP was restored using the built-in troubleshooter, the command succeeded and obtained a valid 192.168.x.x address.
-
-**Screenshot (before fix):**  
-[Insert Screenshot: Windows – renew error]
-
-**Screenshot (after fix):**  
-[Insert Screenshot: Windows – renew successful]
-
----
-
-## 5. Xping 8.8.8.8X  
-**Purpose:** Tests reachability and round-trip latency to Google’s public DNS server using ICMP.
-
-**Screenshot:**  
-[Insert Screenshot: Windows – ping]
-
----
-
-## 6. Xtracert 8.8.8.8X  
-**Purpose:** Traces the route packets take to a destination, showing intermediate hops.
-
-**Screenshot:**  
-[Insert Screenshot: Windows – tracert]
-
----
-
-## 7. Xarp -aX  
-**Purpose:** Displays the system’s ARP table, showing IP-to-MAC address mappings.
-
-**Screenshot:**  
-[Insert Screenshot: Windows – arp -a]
-
----
-
-# Assignment 2 – Applied Networking Concepts 2 (Windows)
-
-## Required Tasks
-
-### 1. Obtain MAC Address  
-Command used: XgetmacX  
-**Screenshot:**  
-[Insert Screenshot: Windows – getmac]
-
----
-
-### 2. Obtain IP Address  
-Command used: XipconfigX  
-**Screenshot:**  
-[Insert Screenshot: Windows – ipconfig]
-
----
-
-### 3. Obtain ARP Table Mapping  
-Command used: Xarp -aX  
-**Screenshot:**  
-[Insert Screenshot: Windows – arp -a]
-
----
-
-### 4. Explain ARP Table  
-**Summary Explanation:**  
-The ARP table stores mappings between Layer 3 IPv4 addresses and Layer 2 MAC addresses.  
-Dynamic entries are learned through ARP requests and responses, while static entries represent reserved or broadcast mappings.  
-Windows references this table to deliver frames on the local network segment.
-
----
-
-### 5. Obtain DNS Server  
-Command used: Xnslookup google.comX  
-**Screenshot:**  
-[Insert Screenshot: Windows – nslookup]
-
----
-
-# Assignment 3 – Applied Networking Concepts (Ubuntu Linux)
-
-## Required Tasks  
-These commands were executed after installing Xnet-toolsX.
-
----
-
-## 1. XifconfigX  
-**Purpose:** Shows interface details such as IPv4 address, netmask, and MAC address.
-
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – ifconfig]
-
----
-
-## 2. Xping -c 4 8.8.8.8X  
-**Purpose:** Tests connectivity and packet statistics.
-
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – ping]
-
----
-
-## 3. Xtraceroute 8.8.8.8X  
-**Purpose:** Shows the path packets take through each router on the network.
-
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – traceroute]
-
----
-
-## 4. Xarp -aX  
-**Purpose:** Displays ARP table entries for local network devices.
-
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – arp -a]
-
----
-
-# Assignment 4 – Applied Networking Concepts 2 (Ubuntu)
-
-## 1. Obtain MAC Address  
-Command used: Xip linkX  
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – ip link]
-
----
-
-## 2. Obtain IP Address  
-Command used: Xip addr showX  
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – ip addr]
-
----
-
-## 3. Obtain ARP Table Mapping  
-Command used: Xarp -aX  
-**Screenshot:**  
-[Insert Screenshot: Ubuntu – arp -a]
-
----
-
-# Assignment 5 – Computer Networking Theory
-
-## Required Devices  
-For each device below, describe purpose, OSI layer, similarities/differences, and form factor.
-
-### 1. Hub  
-- Operates at Layer 1 (Physical)  
-- Broadcasts all traffic to all ports  
-- No MAC learning or switching logic  
-- Minimum ports: typically 4  
-- Form factor: small desktop device  
-
-**Image Placeholder:**  
-[Insert Image – Hub]
-
----
-
-### 2. Switch  
-- Operates at Layer 2 (Data Link)  
-- Maintains MAC address tables  
-- Sends frames only to the correct port  
-- Minimum ports: 4–8  
-- Form factor: desktop or rack-mount  
-
-**Image Placeholder:**  
-[Insert Image – Switch]
-
----
-
-### 3. Router  
-- Operates at Layer 3 (Network Layer)  
-- Makes forwarding decisions based on IP routes  
-- Connects different networks and performs NAT  
-- Minimum ports: typically 2 (WAN/LAN)  
-- Form factor: home router or enterprise rack-mount  
-
-**Image Placeholder:**  
-[Insert Image – Router]
-
----
-
-# Assignment 6 – Network Theory Concepts
-
-## 1. What Makes Up a MAC Address  
-A MAC address is a 48-bit identifier consisting of:  
-- **OUI** (first 24 bits) identifying the manufacturer  
-- **Device ID** (last 24 bits) uniquely identifying the interface  
-
-**Screenshot:**  
-[Insert Screenshot – MAC address]
-
----
-
-## 2. What Makes Up an IP Address  
-An IPv4 address consists of:  
-- Network portion  
-- Host portion  
-Defined by its subnet mask.  
-
-**Screenshot:**  
-[Insert Screenshot – IPv4 Address]
-
----
-
-## 3. Explain DNS  
-DNS translates human-readable names (google.com) into IP addresses.  
-It operates at Application Layer and enables domain-based routing.
-
-**Screenshot:**  
-[Insert Screenshot – nslookup]
-
----
-
-## 4. Explain DHCP  
-DHCP automatically assigns IP configuration parameters including:  
-- IPv4 Address  
-- Subnet Mask  
-- Default Gateway  
-- DNS Servers  
-
-It uses the DORA process: Discover, Offer, Request, Acknowledge.
-
-**Screenshot:**  
-[Insert Screenshot – DHCP lease proof from ipconfig /all]
-
----
-
-## 5. Show DHCP Client Identifier (CLID) Request  
-Command used: Xipconfig /renewX  
-This forces the system to request a new lease from the DHCP server.
-
-**Screenshot:**  
-[Insert Screenshot – renew output]
-
----
-
-# End of Document
+Basic Networking Command List  
+Applied Networking Concepts – Windows and Ubuntu
+
+This report documents hands-on interaction with the Windows and Ubuntu networking stacks using common administrative utilities. All tasks were performed inside VirtualBox virtual machines, with screenshots captured throughout. The work includes analyzing IP configuration, validating DHCP behavior, resolving DNS, inspecting ARP tables, tracing routes, and reviewing foundational networking theory. Troubleshooting is also incorporated, including resolving DHCP failures through Windows' automated repair tools.
+
+  
+**Windows Networking – Command Usage and Analysis**
+
+```PowerShell
+ipconfig
+```  
+Used to display core network details such as IPv4 address, subnet mask, and default gateway. This provides a quick view of the system’s active interface configuration.  
+[Screenshot – ipconfig]
+
+```PowerShell
+ipconfig /all
+```  
+Shows full adapter configuration including hostname, MAC address, DHCP status, DNS servers, lease information, and detailed network parameters.  
+[Screenshot – ipconfig /all]
+
+```PowerShell
+ipconfig /release
+```  
+Attempts to drop the current DHCP lease. The command initially failed with “The operation failed as no adapter is in the state permissible for this operation,” which indicated the Ethernet interface was not using DHCP. The issue was resolved by running the Windows Network Troubleshooter, which re-enabled DHCP for the adapter. After DHCP was restored, the command successfully released the address.  
+[Screenshot – release (error)]  
+[Screenshot – release (fixed)]
+
+```PowerShell
+ipconfig /renew
+```
+Requests a new DHCP lease. Prior to fixing DHCP, the command returned an error. Once DHCP was re-enabled via troubleshooting, Windows successfully obtained a valid 192.168.x.x address.  
+[Screenshot – renew (error)]  
+[Screenshot – renew (fixed)]
+
+```PowerShell
+ping 8.8.8.8
+```  
+Used to verify connectivity and measure round-trip time to Google’s public DNS server. Confirms ICMP operation and basic external reachability.  
+[Screenshot – ping]
+
+```PowerShell
+tracert 8.8.8.8
+```
+Displays the route traffic takes from the local machine to the destination, showing each routing hop along the path.  
+[Screenshot – tracert]
+
+```PowerShell
+arp -a
+```
+Displays the ARP table, which contains mappings between IPv4 addresses and their corresponding MAC addresses.  
+[Screenshot – ARP Table]
+
+  
+**Windows – Additional Networking Tasks**
+
+Obtaining the MAC Address  
+`getmac` was used to retrieve the system’s physical (MAC) address.  
+[Screenshot – getmac]
+
+Obtaining the IP Address  
+Identified using `ipconfig`.  
+[Screenshot – ipconfig]
+
+Obtaining ARP Table Mappings  
+Performed using `arp -a`.  
+[Screenshot – arp]
+
+DNS Server Query  
+`nslookup google.com` was used to identify the DNS resolver and confirm successful name resolution.  
+[Screenshot – nslookup]
+
+Explanation of the ARP Table  
+The ARP table stores IPv4-to-MAC address mappings that allow communication on the local network. Windows dynamically updates these entries as devices are discovered. The table enables Layer 3 to Layer 2 translation so that Ethernet frames can be delivered to the correct physical device.
+
+  
+**Ubuntu Linux Networking – Command Usage and Analysis**
+
+XifconfigX  
+Displays interface information such as IPv4 address, broadcast address, netmask, and MAC address.  
+[Screenshot – ifconfig]
+
+Xping -c 4 8.8.8.8X  
+Tests connectivity to an external host with a fixed number of ICMP requests.  
+[Screenshot – ping (Ubuntu)]
+
+Xtraceroute 8.8.8.8X  
+Shows the path each packet takes across intermediary routers to reach the destination.  
+[Screenshot – traceroute]
+
+Xarp -aX  
+Shows IP-to-MAC address mappings known by the local Linux system.  
+[Screenshot – arp (Ubuntu)]
+
+  
+**Ubuntu – Additional Networking Tasks**
+
+MAC Address  
+Identified using Xip linkX.  
+[Screenshot – ip link]
+
+IP Address  
+Identified using Xip addr showX.  
+[Screenshot – ip addr show]
+
+ARP Table Mapping  
+Displayed using Xarp -aX.  
+[Screenshot – arp]
+
+DHCP Verification  
+The Xnmcli device showX command confirms DHCP-provided IPv4 configuration and shows DHCP options delivered by the server.  
+[Screenshot – nmcli]
+
+DHCP Client Request  
+Xsudo dhclient -vX was used to demonstrate a DHCP discovery and request sequence from the Linux VM.  
+[Screenshot – dhclient]
+
+  
+**Networking Devices – Hub, Switch, Router**
+
+Hub  
+A hub operates at the Physical Layer (Layer 1). It repeats incoming signals out all other ports without inspecting traffic. It does not maintain MAC tables, does not filter frames, and broadcasts all traffic. Common form factors include small desktop devices with at least four ports.  
+[Insert Hub Image]
+
+Switch  
+A switch operates at the Data Link Layer (Layer 2). It maintains a MAC address table and forwards frames only to the correct destination port. This reduces collisions and improves efficiency. Switches typically start at four to eight ports and come in desktop or rack-mount form factors.  
+[Insert Switch Image]
+
+Router  
+A router operates at the Network Layer (Layer 3). It makes forwarding decisions based on IP addresses, performs routing between networks, and may implement NAT and firewall functions. Routers generally include at least two interfaces (LAN/WAN) and are available as home devices or enterprise rack-mounted units.  
+[Insert Router Image]
+
+  
+**Networking Theory – MAC, IP, DNS, DHCP, DORA**
+
+What Makes Up a MAC Address  
+A MAC address is a 48-bit identifier composed of an Organizationally Unique Identifier (first 24 bits) and a device-specific identifier (last 24 bits). It uniquely identifies a network interface at Layer 2.  
+[Screenshot – MAC address example]
+
+What Makes Up an IP Address  
+An IPv4 address consists of a network portion and a host portion, defined by the subnet mask. The network portion identifies the network, while the host portion identifies devices within that network.  
+[Screenshot – IP address example]
+
+Explanation of DNS  
+DNS resolves human-readable domain names into numerical IP addresses. It is essential for locating servers, web services, and network resources.
+
+Explanation of DHCP  
+DHCP automatically assigns IP addresses and related configuration (gateway, DNS, subnet mask). This allows systems to join networks without manual configuration.  
+[Screenshot – DHCP lease information]
+
+Explanation of the DORA Process  
+DHCP uses a four-step sequence:  
+• Discover – The client broadcasts a request for configuration  
+• Offer – The DHCP server responds with an available address  
+• Request – The client formally requests that address  
+• Acknowledge – The server approves the lease and provides configuration  
+[Screenshot – DHCP client request]
+
+  
+End of Document
