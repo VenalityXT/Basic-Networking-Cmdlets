@@ -45,8 +45,7 @@ And the renew command failed in the exact same way:
 
 <img width="541" height="110" alt="ipconfig renew" src="https://github.com/user-attachments/assets/429c7ae6-919c-4594-adae-34fa28f007ee" />
 
-At first, it looked like a Windows-side issue—maybe a permissions problem or a disabled interface. But the error was actually pointing to something deeper:  
-**the VM wasn’t connected to a real LAN segment where DHCP could operate.**  
+At first, it looked like a Windows-side issue; maybe a permissions problem or a disabled interface. But the error was actually pointing to something simplier: **the VM wasn’t connected to a real LAN segment where DHCP could operate.**  
 VirtualBox had the VM attached to a **NAT** interface, meaning the guest OS wasn’t handling DHCP on the network at all.
 
 Switching the VM’s network mode from NAT to **Bridged Adapter** allowed the VM to act like a real device on the local network, making DHCP functional again. After changing this setting and restarting the VM, the adapter finally entered a state where release/renew operations were valid.
@@ -55,11 +54,11 @@ Switching the VM’s network mode from NAT to **Bridged Adapter** allowed the VM
 
 Once bridged mode was active, I ran the Windows Network Troubleshooter on the Ethernet interface. The diagnostic tool automatically re-enabled DHCP client functionality, finishing the fix and restoring normal network behavior.
 
-After that, Xipconfig /releaseX cleanly dropped the active lease:
+After that, `ipconfig /release` cleanly dropped the active lease:
 
 <img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/704cc8b4-7f26-439f-84f6-d84e91a6a2ad" />
 
-And Xipconfig /renewX successfully acquired a fresh 192.168.x.x address from the router, complete with updated DNS and gateway information:
+And `ipconfig /renew` successfully acquired a fresh 192.168.x.x address from the router, complete with updated DNS and gateway information:
 
 <img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/ee33e651-63eb-4043-9f63-643873ca0764" />
 
