@@ -336,7 +336,7 @@ sudo dhclient -v
 
 ## Hub (Layer 1)
 
-![Hub drawio](https://github.com/user-attachments/assets/d317a776-6c8e-419d-a38f-59351ffe05d0)
+![Hub drawio](https://github.com/user-attachments/assets/ffbeb430-4a2e-443a-9aa7-5c6c10c68fea)
 
 > A hub repeats *everything* to *everyone* — the “shouting in a room” device.
 
@@ -419,5 +419,6 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
 
