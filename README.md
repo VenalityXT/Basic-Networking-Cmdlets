@@ -6,7 +6,7 @@
 
 ## **Project Overview**
 
-This project provides a technically detailed walkthrough of foundational networking commands across **Windows** and **Ubuntu Linux**, documenting how each tool exposes the behavior of the underlying network stack. The write-up emphasizes interpretation rather than basic usage—explaining what each output reveals about addressing, routing, ARP table population, DNS resolution, and DHCP negotiation.
+This project provides a technically detailed walkthrough of foundational networking commands across **Windows** and **Ubuntu Linux**, documenting how each tool exposes the behavior of the underlying network stack. The write-up emphasizes interpretation rather than basic usage; explaining what each output reveals about addressing, routing, ARP table population, DNS resolution, and DHCP negotiation.
 
 Troubleshooting scenarios are included as well, notably resolving a DHCP failure inside a virtualized Windows environment by analyzing adapter behavior, switching VirtualBox networking modes, and validating DHCP client recovery. This mirrors the real diagnostic process used by system administrators, SOC analysts, and network technicians.
 
