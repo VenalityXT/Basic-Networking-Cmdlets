@@ -13,7 +13,7 @@ Troubleshooting scenarios are included as well, notably resolving a DHCP failure
 
 ---
 
-## **Skills Demonstrated**
+## **Core Competencies**
 
 Although the focus is on documentation and analysis rather than automation, this project reflects several core competencies relevant in enterprise environments:
 
