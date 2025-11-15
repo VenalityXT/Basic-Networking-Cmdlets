@@ -38,9 +38,9 @@ Each command below includes **context**, **interpretation**, and **details extra
 
 ## IP Configuration  
 
-X  
+```  
 ipconfig  
-X
+```
 
 This command provides a quick diagnostic snapshot showing:
 
@@ -65,9 +65,9 @@ This output immediately answers:
 
 ## Full Adapter Details  
 
-X  
+```  
 ipconfig /all  
-X
+```
 
 The `/all` option exposes the **entire** adapter profile.
 
@@ -96,9 +96,9 @@ Useful when diagnosing DHCP or DNS conflicts.
 
 ## Connectivity Tests  
 
-X  
+```  
 ping 8.8.8.8  
-X
+```
 
 <img width="458" height="212" alt="ping" src="https://github.com/user-attachments/assets/50c692d4-e3ef-44ca-8911-58de3fc166a3" />
 
@@ -117,9 +117,9 @@ Ping validates basic reachability and tests latency on the path.
 
 ## Route Tracing  
 
-X  
+```  
 tracert 8.8.8.8  
-X
+```
 
 <img width="646" height="334" alt="tracert" src="https://github.com/user-attachments/assets/ca729c1f-93df-4637-a811-b8426ec68d3f" />
 
@@ -139,9 +139,9 @@ Common issues traceroute reveals:
 
 ## ARP Table  
 
-X  
+```  
 arp -a  
-X
+```
 
 <img width="435" height="178" alt="arp" src="https://github.com/user-attachments/assets/93334ba8-8710-4c1b-8f81-0c7e0e827f92" />
 
@@ -162,10 +162,10 @@ This section demonstrates how virtualization settings impact real network behavi
 
 ## The Failure  
 
-X  
+```  
 ipconfig /release  
 ipconfig /renew  
-X
+```
 
 Both commands returned:
 
@@ -202,11 +202,11 @@ After the change + VM restart, the Windows Network Troubleshooter automatically 
 
 Release:
 
-<img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/592b4a19-cad5-4ce7-81a5-7fe4eb35a190" />
+<img width="521" height="186" alt="ipconfig release FI```ED" src="https://github.com/user-attachments/assets/592b4a19-cad5-4ce7-81a5-7fe4eb35a190" />
 
 Renew:
 
-<img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/620bddac-3fbd-4b82-baba-04014b9cd4df" />
+<img width="521" height="209" alt="ipconfig renew FI```ED" src="https://github.com/user-attachments/assets/620bddac-3fbd-4b82-baba-04014b9cd4df" />
 
 This confirmed:
 
@@ -221,9 +221,9 @@ This confirmed:
 
 ## MAC Address (getmac)
 
-X  
+```  
 getmac  
-X
+```
 
 <img width="636" height="103" alt="getmac" src="https://github.com/user-attachments/assets/a5d351d3-074d-4496-924b-624b8a4c5bc7" />
 
@@ -231,9 +231,9 @@ X
 
 ## DNS Query (nslookup)
 
-X  
+```  
 nslookup google.com  
-X
+```
 
 <img width="347" height="145" alt="nslookup" src="https://github.com/user-attachments/assets/c8972386-dc58-4e1f-bb7d-209858ec10fc" />
 
@@ -249,9 +249,9 @@ Confirms:
 
 ## Interface Listing
 
-X  
+```  
 ifconfig  
-X
+```
 
 <img width="859" height="629" alt="ubuntu ifconfig" src="https://github.com/user-attachments/assets/0ded335b-0055-46c2-b4fa-62f7be68c5fb" />
 
@@ -259,9 +259,9 @@ X
 
 ## Connectivity Tests (Linux)
 
-X  
+```  
 ping -c 4 8.8.8.8  
-X
+```
 
 <img width="661" height="227" alt="ubuntu ping" src="https://github.com/user-attachments/assets/384398a3-345a-489e-8c2d-462878433a1b" />
 
@@ -269,9 +269,9 @@ X
 
 ## Route Tracing (Linux)
 
-X  
+```  
 traceroute 8.8.8.8  
-X
+```
 
 <img width="673" height="732" alt="ubuntu traceroute" src="https://github.com/user-attachments/assets/9efaa038-0924-4030-8661-6adfbd4aa7fd" />
 
@@ -279,9 +279,9 @@ X
 
 ## ARP Table (Linux)
 
-X  
+```  
 arp -a  
-X
+```
 
 <img width="586" height="50" alt="ubuntu arp" src="https://github.com/user-attachments/assets/84739b30-c203-4d20-a3f4-5026c22a8ffb" />
 
@@ -291,9 +291,9 @@ X
 
 ## MAC Address
 
-X  
+```  
 ip link  
-X
+```
 
 <img width="1152" height="146" alt="ubuntu ip link" src="https://github.com/user-attachments/assets/25b05bf4-0522-410e-8250-7b9ac3fff7ff" />
 
@@ -301,9 +301,9 @@ X
 
 ## IP Address
 
-X  
+```  
 ip addr show  
-X
+```
 
 <img width="1019" height="432" alt="ubuntu ip addr show" src="https://github.com/user-attachments/assets/a9d57c03-f448-45d1-b17e-1c3a107113a3" />
 
@@ -324,9 +324,9 @@ Reveals:
 
 ## DHCP Client Request
 
-X  
+```  
 sudo dhclient -v  
-X
+```
 
 > Shows the full DORA process in real time.
 
@@ -419,4 +419,5 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
