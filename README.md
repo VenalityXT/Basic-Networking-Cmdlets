@@ -59,7 +59,7 @@ This project documents that workflow in a clean, repeatable format.
 
 The full cross-platform analysis, including screenshots and detailed interpretation, is available here:
 
-**[Basic_Networking_Cmdlets.md](./Basic_Networking_Cmdlets.md)**
+**[Networking_Cmdlets.md](./Networking_Cmdlets.md)**
 
 ---
 
