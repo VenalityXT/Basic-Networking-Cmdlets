@@ -1,1 +1,422 @@
-# Basic Networking Command List ### Cross-Platform Analysis of Windows & Ubuntu Networking Tools This document provides a structured walkthrough of essential networking utilities across **Windows** and **Ubuntu Linux**, blending practical command output with focused analysis of how each tool reveals the behavior of the underlying network stack. The goal is not just to *run* these commands, but to interpret what they show—addressing, routing, ARP resolution, DNS behavior, DHCP negotiation, and how virtualized environments impact all of it. The document is organized for clarity, readability, and technical depth, using varied Markdown formatting to create a resource that is both visually engaging and practically informative. --- ## Table of Contents - [Windows Networking Core Commands](#windows-networking-core-commands) - [IP Configuration](#ip-configuration) - [Full Adapter Details](#full-adapter-details) - [Connectivity Tests](#connectivity-tests) - [Route Tracing](#route-tracing) - [ARP Table](#arp-table) - [DHCP Failure Case Study (ipconfig /release & /renew)](#dhcp-failure-case-study-ipconfig-release--renew) - [Additional Windows Networking Tasks](#additional-windows-networking-tasks) - [Ubuntu Networking Core Commands](#ubuntu-networking-core-commands) - [Interface Listing](#interface-listing) - [Connectivity Tests (Linux)](#connectivity-tests-linux) - [Route Tracing (Linux)](#route-tracing-linux) - [ARP Table (Linux)](#arp-table-linux) - [Additional Ubuntu Tasks](#additional-ubuntu-tasks) - [Networking Devices Overview](#networking-devices-overview) - [Networking Theory (MAC, IP, DNS, DHCP, DORA)](#networking-theory-mac-ip-dns-dhcp-dora) - [Real-World Applications](#real-world-applications) --- # Windows Networking Core Commands Windows exposes much of its TCP/IP stack through simple but powerful CLI utilities. These commands reveal everything from address assignment to routing paths, interface behavior, and ARP cache contents. Each command below includes **context**, **interpretation**, and **relevant details extracted from the screenshot**, not just surface-level descriptions. --- ## IP Configuration ```PowerShell ipconfig ``` This command provides a quick diagnostic snapshot showing: - The active interface - IPv4 address - Subnet mask - Default gateway <img width="598" height="246" alt="ipconfig" src="https://github.com/user-attachments/assets/e535c7be-c7d2-41de-a285-2abe1f001998" /> ### What the screenshot reveals: - The VM received an address in the `192.168.x.x` range, typical of a home LAN. - The default gateway is also present—meaning routing is available. - Subnet mask confirms a standard `/24` network. This output immediately answers the question: **“Am I on the network, and who is my router?”** --- ## Full Adapter Details ```PowerShell ipconfig /all ``` Where the basic `ipconfig` shows the essentials, `/all` exposes the **full interface profile**. <img width="684" height="480" alt="ipconfig all" src="https://github.com/user-attachments/assets/6eb174a9-530c-4329-b3f4-c293ae22ed33" /> ### How to read this output: | Field | Meaning | Why It Matters | |-------|---------|----------------| | Host Name | System's network identity | Important in domain environments | | Physical Address | MAC | Used for ARP, DHCP, network inventory | | DHCP Enabled | Yes/No | Tells whether IP is dynamic or static | | DHCP Server | The leasing source | Should match router or DHCP relay | | DNS Servers | Resolver list | Unexpected entries = DNS hijack? | | Lease Obtained/Expires | DHCP timers | Helps diagnose lease conflicts | ### In this screenshot: - DHCP **is enabled**, confirming the interface expects dynamic addressing. - DNS is pulled from the router, typical for small networks. - Lease times are visible, confirming normal DHCP negotiation. > When diagnosing DNS or DHCP problems, this is the first place to check for mismatched servers, expired leases, or improper static configurations. --- ## Connectivity Tests ```PowerShell ping 8.8.8.8 ``` ICMP echo requests validate that packets are leaving the machine and returning from a destination. <img width="458" height="212" alt="ping" src="https://github.com/user-attachments/assets/50c692d4-e3ef-44ca-8911-58de3fc166a3" /> ### Interpreting the output: | Field | Meaning | Interpretation | |-------|---------|----------------| | Reply | Successful ICMP response | The host is reachable | | Time | Latency | Under ~40ms = healthy home LAN to Google | | TTL | Time-to-live | Clue about number of hops | | Packet Loss | Connectivity issues | 0% is ideal | This confirms end-to-end reachability and shows no packet loss. --- ## Route Tracing ```PowerShell tracert 8.8.8.8 ``` Traceroute reveals exactly **which routers** your packet travels through. <img width="646" height="334" alt="tracert" src="https://github.com/user-attachments/assets/ca729c1f-93df-4637-a811-b8426ec68d3f" /> ### How to read traceroute: - Each line = a hop (router) between you and the destination. - `*` means a router didn’t reply but still forwarded packets. - Increasing latency generally indicates physical distance or processing load. ### Common traceroute concepts: - **Routing loops:** When traceroute repeats the same hops indefinitely (misconfigured routing). - **Asymmetric routing:** Outbound path ≠ inbound path; debugging firewalls often reveals this. - **Dropped hops:** Routers may forward but not respond to ICMP TTL-expired packets. This screenshot shows a healthy route: hops increase sequentially with no anomalies. --- ## ARP Table ```PowerShell arp -a ``` ARP maps IPv4 addresses to MAC addresses on the **local network**. <img width="435" height="178" alt="arp" src="https://github.com/user-attachments/assets/93334ba8-8710-4c1b-8f81-0c7e0e827f92" /> ### How to interpret ARP entries: | Column | Meaning | |--------|---------| | Internet Address | IPv4 address on LAN | | Physical Address | MAC address of discovered device | | Type | Dynamic vs Static | ### Observations: - The router’s IP appears with a MAC address—confirming layer-2 visibility. - Entries are **dynamic**, meaning learned through ARP broadcasts. - No suspicious duplicate MACs (which can indicate ARP spoofing). ARP helps answer: **“Who is actually on my network, and what hardware do they claim to be?”** --- # DHCP Failure Case Study (ipconfig /release & /renew) This was the most instructive part of the project—demonstrating how virtualization impacts network behavior and how DHCP negotiation fails when misconfigured. --- ## The Failure Attempting: ```PowerShell ipconfig /release ipconfig /renew ``` produced the same message both times: **“The operation failed as no adapter is in the state permissible for this operation.”** Release attempt: <img width="539" height="113" alt="ipconfig release" src="https://github.com/user-attachments/assets/9668e726-2b14-43e3-8b9d-bba7ddfc3e27" /> Renew attempt: <img width="541" height="110" alt="ipconfig renew" src="https://github.com/user-attachments/assets/a15bcd84-321d-4ae4-947d-90991c8dd0bc" /> This wasn’t Windows being difficult. It simply didn’t *have* a DHCP lease to release or renew. --- ## The Real Root Cause The VM was running in **NAT mode**. In NAT mode: - VirtualBox is the DHCP server - Windows never talks to the real LAN - Windows cannot request/release external DHCP leases - ipconfig /release & /renew become meaningless Switching VirtualBox to **Bridged Adapter** puts the VM directly on the LAN, enabling real DHCP interaction. <img width="988" height="474" alt="fixing ipconfig release and renew commands" src="https://github.com/user-attachments/assets/60505178-2f87-4ae2-92ae-cf08c41185fe" /> After switching modes and restarting the VM, Windows Network Troubleshooter re-enabled DHCP client functionality on the Ethernet adapter. > The moment bridged mode was enabled, Windows went from > “I don’t know who my DHCP server is…” > to > “Okay, *now* we’re talking to the network.” --- ## After the Fix Release now worked: <img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/592b4a19-cad5-4ce7-81a5-7fe4eb35a190" /> Renew succeeded, acquiring a valid `192.168.x.x` lease: <img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/620bddac-3fbd-4b82-baba-04014b9cd4df" /> This sequence demonstrates: - How virtualization settings impact real networking - How Windows behaves without DHCP authority - How release/renew reflect underlying DHCP states - How the Network Troubleshooter resets DHCP client configuration --- # Additional Windows Networking Tasks ## MAC Address (getmac) Shows physical MAC addresses bound to Windows interfaces. ```PowerShell getmac ``` <img width="636" height="103" alt="getmac" src="https://github.com/user-attachments/assets/a5d351d3-074d-4496-924b-624b8a4c5bc7" /> Use cases: - ARP validation - Network inventory - Troubleshooting mismatched VLAN assignments - Detecting MAC spoofing --- ## DNS Query (nslookup) ```PowerShell nslookup google.com ``` <img width="347" height="145" alt="nslookup" src="https://github.com/user-attachments/assets/c8972386-dc58-4e1f-bb7d-209858ec10fc" /> ### What this confirms: - DNS server responding - Domain resolution functioning - No DNS hijack or redirect - Network path supports UDP/TCP queries --- # Ubuntu Networking Core Commands Linux provides deeper, more granular networking tools. While Windows focuses on convenience, Linux surfaces the raw details of interfaces, routes, and neighbor caches. --- ## Interface Listing ```Bash ifconfig ``` <img width="859" height="629" alt="ubuntu ifconfig" src="https://github.com/user-attachments/assets/0ded335b-0055-46c2-b4fa-62f7be68c5fb" /> ### What we see: - Interface `ens33` is up - IPv4: in the same subnet as Windows - MAC address clearly visible - Broadcast & netmask information present --- ## Connectivity Tests (Linux) ```Bash ping -c 4 8.8.8.8 ``` <img width="661" height="227" alt="ubuntu ping" src="https://github.com/user-attachments/assets/384398a3-345a-489e-8c2d-462878433a1b" /> Linux pings show similar data: - packet size - RTT (round trip times) - min/avg/max/mdev latency summary --- ## Route Tracing (Linux) ```Bash traceroute 8.8.8.8 ``` <img width="673" height="732" alt="ubuntu traceroute" src="https://github.com/user-attachments/assets/9efaa038-0924-4030-8661-6adfbd4aa7fd" /> Linux traceroute often uses UDP packets (unlike Windows using ICMP), so path differ slightly—but hop structure remains similar. --- ## ARP Table (Linux) ```Bash arp -a ``` <img width="586" height="50" alt="ubuntu arp" src="https://github.com/user-attachments/assets/84739b30-c203-4d20-a3f4-5026c22a8ffb" /> Same interpretation logic as Windows: - IP → MAC mappings - Mostly dynamic entries - Router MAC visible - Confirms local-network presence --- # Additional Ubuntu Tasks ## MAC Address (ip link) ```Bash ip link ``` <img width="1152" height="146" alt="ubuntu ip link" src="https://github.com/user-attachments/assets/25b05bf4-0522-410e-8250-7b9ac3fff7ff" /> --- ## IP Address (ip addr show) ```Bash ip addr show ``` <img width="1019" height="432" alt="ubuntu ip addr show" src="https://github.com/user-attachments/assets/a9d57c03-f448-45d1-b17e-1c3a107113a3" /> --- ## DHCP Verification (nmcli) <img width="912" height="923" alt="ubuntu nmcli device show" src="https://github.com/user-attachments/assets/2d667bf5-1bb2-46fa-9022-e2a7464eea40" /> This output reveals: - DHCP server - Lease duration - DNS servers - IPv4 assignment source - Associated device --- ## DHCP Client Request (dhclient) ```Bash sudo dhclient -v ``` [Insert Screenshot – dhclient] Shows full DORA exchange in real time. --- # Networking Devices Overview A quick overview of foundational Layer 1–3 hardware. --- ## Hub (Layer 1) ![Hub drawio](https://github.com/user-attachments/assets/d317a776-6c8e-419d-a38f-59351ffe05d0) > Think of a hub as shouting information into a room: everyone hears it, even if it’s meant for one person. --- ## Switch (Layer 2) ![Switch drawio](https://github.com/user-attachments/assets/67ada540-a86c-4723-95cb-6011ff0851ac) > A switch listens first, learns second, and forwards intelligently based on MAC addresses. --- ## Router (Layer 3) ![Router drawio](https://github.com/user-attachments/assets/2f573cfa-99c1-4df6-a47e-ffecd8755aec) > If the switch handles your neighorhood, the router handles the world beyond it. --- # Networking Theory (MAC, IP, DNS, DHCP, DORA) ## MAC Address 48-bit hardware identifier. OUI = vendor prefix + device-specific suffix. <img src="httpsgithubusercontent/assets/ec6a6d58-5d62-42b7-a4ae-fa7c8223d502"> --- ## IP Address Divided into **network** and **host** portions based on subnet mask. <img src="httpsgithubusercontent/assets/86a06bdc-9ab9-4bb2-9cb1-c161bc1ba8e8"> --- ## DNS Resolves domain names to IP addresses. Critical for accessing both internal and external services. --- ## DHCP Assigns: - IPv4 address - Subnet mask - Default gateway - DNS servers - Lease duration [Insert Screenshot – DHCP lease info] --- ## DORA DHCP’s four-step negotiation: 1. **Discover** – Client broadcasts request 2. **Offer** – Server provides an available address 3. **Request** – Client requests the offered configuration 4. **Acknowledge** – Server finalizes the lease [Insert Screenshot – DHCP client request] --- # Real-World Applications These tools are used constantly in enterprise environments to: - Diagnose VLAN/IP addressing conflicts - Verify DHCP relay or scope configuration - Investigate ARP poisoning or duplicate MAC addresses - Debug DNS failures or slow name resolution - Trace routing asymmetry across WAN links - Validate host reachability during outages - Audit interface configurations during provisioning - Understand hypervisor networking impact on guest systems This set of commands represents the **baseline operational toolkit** for system administrators, Tier 1 SOC analysts, network technicians, and IT professionals responsible for maintaining reliable connectivity and diagnosing network behavior. --- <?xml version="1.0" encoding="UTF-8"?> <!-- Do not edit this file with editors other than draw.io --> <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"> <svg xmlns="http://www.w3.org/2000/svg" style="background: #FFFFFF; background-color: #FFFFFF; color-scheme: light dark;" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="893px" height="567px" viewBox="0 0 893 567" content="&lt;mxfile host=&quot;app.diagrams.net&quot; agent=&quot;Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/139.0.0.0 Safari/537.36&quot; version=&quot;29.0.2&quot; scale=&quot;1&quot; border=&quot;0&quot;&gt;&#10;  &lt;diagram name=&quot;Page-1&quot; id=&quot;CS5vIfcJkwlz9qRXH-_A&quot;&gt;&#10;    &lt;mxGraphModel dx=&quot;1426&quot; dy=&quot;743&quot; grid=&quot;0&quot; gridSize=&quot;10&quot; guides=&quot;1&quot; tooltips=&quot;1&quot; connect=&quot;1&quot; arrows=&quot;1&quot; fold=&quot;1&quot; page=&quot;1&quot; pageScale=&quot;1&quot; pageWidth=&quot;1100&quot; pageHeight=&quot;850&quot; background=&quot;light-dark(#FFFFFF,#FFFFFF)&quot; math=&quot;0&quot; shadow=&quot;0&quot;&gt;&#10;      &lt;root&gt;&#10;        &lt;mxCell id=&quot;0&quot; /&gt;&#10;        &lt;mxCell id=&quot;1&quot; parent=&quot;0&quot; /&gt;&#10;        &lt;mxCell id=&quot;2&quot; value=&quot;&quot; style=&quot;rounded=0;align=center;spacingLeft=0;fontColor=light-dark(#000000,#0000
+# Basic Networking Command List  
+### Cross-Platform Analysis of Windows & Ubuntu Networking Tools
+
+This document provides a structured walkthrough of essential networking utilities across **Windows** and **Ubuntu Linux**, blending practical command output with focused analysis of how each tool reveals the behavior of the underlying network stack. The goal is not just to *run* these commands, but to interpret what they show—addressing, routing, ARP resolution, DNS behavior, DHCP negotiation, and how virtualized environments impact all of it.
+
+The document is organized for clarity, readability, and technical depth, using varied Markdown formatting to create a resource that is both visually engaging and practically informative.
+
+---
+
+## Table of Contents
+- [Windows Networking Core Commands](#windows-networking-core-commands)
+- [IP Configuration](#ip-configuration)
+- [Full Adapter Details](#full-adapter-details)
+- [Connectivity Tests](#connectivity-tests)
+- [Route Tracing](#route-tracing)
+- [ARP Table](#arp-table)
+- [DHCP Failure Case Study (ipconfig /release & /renew)](#dhcp-failure-case-study-ipconfig-release--renew)
+- [Additional Windows Networking Tasks](#additional-windows-networking-tasks)
+- [Ubuntu Networking Core Commands](#ubuntu-networking-core-commands)
+- [Interface Listing](#interface-listing)
+- [Connectivity Tests (Linux)](#connectivity-tests-linux)
+- [Route Tracing (Linux)](#route-tracing-linux)
+- [ARP Table (Linux)](#arp-table-linux)
+- [Additional Ubuntu Tasks](#additional-ubuntu-tasks)
+- [Networking Devices Overview](#networking-devices-overview)
+- [Networking Theory (MAC, IP, DNS, DHCP, DORA)](#networking-theory-mac-ip-dns-dhcp-dora)
+- [Real-World Applications](#real-world-applications)
+
+---
+
+# Windows Networking Core Commands
+
+Windows exposes much of its TCP/IP stack through simple but powerful CLI utilities. These commands reveal everything from address assignment to routing paths, interface behavior, and ARP cache contents.
+
+Each command below includes **context**, **interpretation**, and **details extracted from the screenshot**, not just surface-level descriptions.
+
+---
+
+## IP Configuration  
+
+X  
+ipconfig  
+X
+
+This command provides a quick diagnostic snapshot showing:
+
+- The active interface  
+- IPv4 address  
+- Subnet mask  
+- Default gateway  
+
+<img width="598" height="246" alt="ipconfig" src="https://github.com/user-attachments/assets/e535c7be-c7d2-41de-a285-2abe1f001998" />
+
+### What the screenshot reveals:
+
+- VM received an address in the `192.168.x.x` range.  
+- Default gateway is present — routing is active.  
+- Mask confirms standard `/24` network.
+
+This output immediately answers:
+
+> **“Am I on the network, and who is my router?”**
+
+---
+
+## Full Adapter Details  
+
+X  
+ipconfig /all  
+X
+
+The `/all` option exposes the **entire** adapter profile.
+
+<img width="684" height="480" alt="ipconfig all" src="https://github.com/user-attachments/assets/6eb174a9-530c-4329-b3f4-c293ae22ed33" />
+
+### How to read this output:
+
+| Field | Meaning | Why It Matters |
+|-------|---------|----------------|
+| Host Name | Local machine identity | Important for domain joins |
+| Physical Address | MAC address | DHCP, ARP, inventory |
+| DHCP Enabled | Yes/No | Static misconfigs cause outages |
+| DHCP Server | Lease source | Should be router or DHCP relay |
+| DNS Servers | Resolver order | Wrong entries → DNS hijack |
+| Lease Times | Renewal intervals | Conflict detection |
+
+This screenshot shows:
+
+- DHCP **enabled**  
+- DNS from router  
+- Normal lease timings  
+
+Useful when diagnosing DHCP or DNS conflicts.
+
+---
+
+## Connectivity Tests  
+
+X  
+ping 8.8.8.8  
+X
+
+<img width="458" height="212" alt="ping" src="https://github.com/user-attachments/assets/50c692d4-e3ef-44ca-8911-58de3fc166a3" />
+
+### Interpreting the ICMP output:
+
+| Field | Interpretation |
+|-------|----------------|
+| Reply | Host is reachable |
+| TTL | Rough hop-distance |
+| Time | Latency measurement |
+| Packet Loss | Connection stability |
+
+Ping validates basic reachability and tests latency on the path.
+
+---
+
+## Route Tracing  
+
+X  
+tracert 8.8.8.8  
+X
+
+<img width="646" height="334" alt="tracert" src="https://github.com/user-attachments/assets/ca729c1f-93df-4637-a811-b8426ec68d3f" />
+
+### How to read traceroute results:
+
+- Each hop = router between client and destination.  
+- `*` = router forwarded packet but didn’t respond.  
+- Increasing latency = physical distance or router load.
+
+Common issues traceroute reveals:
+
+- **Routing loops** (same hop repeating)
+- **Asymmetric routing** (return path != outbound)
+- **Filtered hops** (firewalls blocking TTL-expired ICMP)
+
+---
+
+## ARP Table  
+
+X  
+arp -a  
+X
+
+<img width="435" height="178" alt="arp" src="https://github.com/user-attachments/assets/93334ba8-8710-4c1b-8f81-0c7e0e827f92" />
+
+### ARP reveals L2 identities:
+
+- Maps **IPv4 → MAC**
+- Shows learned devices on LAN
+- Detects duplicate MAC anomalies
+- Verifies router MAC presence
+
+---
+
+# DHCP Failure Case Study (ipconfig /release & /renew)
+
+This section demonstrates how virtualization settings impact real network behavior and why DHCP negotiation failed at first.
+
+---
+
+## The Failure  
+
+X  
+ipconfig /release  
+ipconfig /renew  
+X
+
+Both commands returned:
+
+**“The operation failed as no adapter is in the state permissible for this operation.”**
+
+Release attempt:
+
+<img width="539" height="113" alt="ipconfig release" src="https://github.com/user-attachments/assets/9668e726-2b14-43e3-8b9d-bba7ddfc3e27" />
+
+Renew attempt:
+
+<img width="541" height="110" alt="ipconfig renew" src="https://github.com/user-attachments/assets/a15bcd84-321d-4ae4-947d-90991c8dd0bc" />
+
+---
+
+## The Real Root Cause
+
+The VM was in **NAT mode**, meaning:
+
+- VirtualBox acted as the DHCP server  
+- The VM wasn’t truly on the LAN  
+- Windows could not contact the real DHCP server  
+- Release/Renew had nothing to operate on  
+
+Switching to **Bridged Adapter** mode fixed this.
+
+<img width="988" height="474" alt="fixing ipconfig release and renew commands" src="https://github.com/user-attachments/assets/60505178-2f87-4ae2-92ae-cf08c41185fe" />
+
+After the change + VM restart, the Windows Network Troubleshooter automatically re-enabled DHCP on the adapter.
+
+---
+
+## After the Fix
+
+Release:
+
+<img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/592b4a19-cad5-4ce7-81a5-7fe4eb35a190" />
+
+Renew:
+
+<img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/620bddac-3fbd-4b82-baba-04014b9cd4df" />
+
+This confirmed:
+
+- The VM is now on the real LAN  
+- DHCP lease negotiation works  
+- Troubleshooter reset DHCP client behavior  
+- Bridged mode allows real network interaction  
+
+---
+
+# Additional Windows Networking Tasks
+
+## MAC Address (getmac)
+
+X  
+getmac  
+X
+
+<img width="636" height="103" alt="getmac" src="https://github.com/user-attachments/assets/a5d351d3-074d-4496-924b-624b8a4c5bc7" />
+
+---
+
+## DNS Query (nslookup)
+
+X  
+nslookup google.com  
+X
+
+<img width="347" height="145" alt="nslookup" src="https://github.com/user-attachments/assets/c8972386-dc58-4e1f-bb7d-209858ec10fc" />
+
+Confirms:
+
+- DNS server reachable  
+- DNS resolution working  
+- No hijacking or redirection  
+
+---
+
+# Ubuntu Networking Core Commands
+
+## Interface Listing
+
+X  
+ifconfig  
+X
+
+<img width="859" height="629" alt="ubuntu ifconfig" src="https://github.com/user-attachments/assets/0ded335b-0055-46c2-b4fa-62f7be68c5fb" />
+
+---
+
+## Connectivity Tests (Linux)
+
+X  
+ping -c 4 8.8.8.8  
+X
+
+<img width="661" height="227" alt="ubuntu ping" src="https://github.com/user-attachments/assets/384398a3-345a-489e-8c2d-462878433a1b" />
+
+---
+
+## Route Tracing (Linux)
+
+X  
+traceroute 8.8.8.8  
+X
+
+<img width="673" height="732" alt="ubuntu traceroute" src="https://github.com/user-attachments/assets/9efaa038-0924-4030-8661-6adfbd4aa7fd" />
+
+---
+
+## ARP Table (Linux)
+
+X  
+arp -a  
+X
+
+<img width="586" height="50" alt="ubuntu arp" src="https://github.com/user-attachments/assets/84739b30-c203-4d20-a3f4-5026c22a8ffb" />
+
+---
+
+# Additional Ubuntu Tasks
+
+## MAC Address
+
+X  
+ip link  
+X
+
+<img width="1152" height="146" alt="ubuntu ip link" src="https://github.com/user-attachments/assets/25b05bf4-0522-410e-8250-7b9ac3fff7ff" />
+
+---
+
+## IP Address
+
+X  
+ip addr show  
+X
+
+<img width="1019" height="432" alt="ubuntu ip addr show" src="https://github.com/user-attachments/assets/a9d57c03-f448-45d1-b17e-1c3a107113a3" />
+
+---
+
+## DHCP Verification (nmcli)
+
+<img width="912" height="923" alt="ubuntu nmcli device show" src="https://github.com/user-attachments/assets/2d667bf5-1bb2-46fa-9022-e2a7464eea40" />
+
+Reveals:
+
+- DHCP server  
+- Lease time  
+- DNS servers  
+- Address source  
+
+---
+
+## DHCP Client Request
+
+X  
+sudo dhclient -v  
+X
+
+> Shows the full DORA process in real time.
+
+---
+
+# Networking Devices Overview
+
+## Hub (Layer 1)
+
+![Hub drawio](https://github.com/user-attachments/assets/d317a776-6c8e-419d-a38f-59351ffe05d0)
+
+> A hub repeats *everything* to *everyone* — the “shouting in a room” device.
+
+---
+
+## Switch (Layer 2)
+
+![Switch drawio](https://github.com/user-attachments/assets/67ada540-a86c-4723-95cb-6011ff0851ac)
+
+> A switch learns MAC addresses and forwards frames intelligently.
+
+---
+
+## Router (Layer 3)
+
+![Router drawio](https://github.com/user-attachments/assets/2f573cfa-99c1-4df6-a47e-ffecd8755aec)
+
+> The router connects your network to *other* networks — the “world beyond your neighborhood.”
+
+---
+
+# Networking Theory (MAC, IP, DNS, DHCP, DORA)
+
+## MAC Address  
+
+> 48-bit burned-in hardware identifier.
+
+<img src="httpsgithubusercontent/assets/ec6a6d58-5d62-42b7-a4ae-fa7c8223d502">
+
+---
+
+## IP Address  
+
+> Divided into **network** and **host** sections using the subnet mask.
+
+<img src="httpsgithubusercontent/assets/86a06bdc-9ab9-4bb2-9cb1-c161bc1ba8e8">
+
+---
+
+## DNS  
+
+> Translates domain names into IP addresses.
+
+---
+
+## DHCP  
+
+Assigns:
+
+- IPv4  
+- Mask  
+- Gateway  
+- DNS  
+- Lease duration  
+
+---
+
+## DORA  
+
+1. Discover  
+2. Offer  
+3. Request  
+4. Acknowledge  
+
+---
+
+# Real-World Applications
+
+These tools are used constantly in enterprise networking work:
+
+- Diagnose VLAN misalignment  
+- Validate DHCP scopes  
+- Investigate ARP poisoning  
+- Debug DNS failures  
+- Trace WAN routing asymmetry  
+- Confirm host reachability  
+- Validate hypervisor networking  
+- Inventory networking hardware  
+
+This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
+
+---
+
