@@ -14,7 +14,7 @@ The document is organized for clarity, readability, and technical depth, using v
 - [Connectivity Tests](#connectivity-tests)
 - [Route Tracing](#route-tracing)
 - [ARP Table](#arp-table)
-- [DHCP Failure Case Study (ipconfig /release & /renew)](#dhcp-failure-case-study-ipconfig-release--renew)
+- [DHCP Failure Case Study (ipconfig release and renew)](#dhcp-failure-case-study-ipconfig-release-and-renew)
 - [Additional Windows Networking Tasks](#additional-windows-networking-tasks)
 - [Ubuntu Networking Core Commands](#ubuntu-networking-core-commands)
 - [Interface Listing](#interface-listing)
@@ -29,14 +29,12 @@ The document is organized for clarity, readability, and technical depth, using v
 ---
 
 # Windows Networking Core Commands
-
+> These tools reveal how Windows handles addressing, routing, DNS, and connectivity.
 Windows exposes much of its TCP/IP stack through simple but powerful CLI utilities. These commands reveal everything from address assignment to routing paths, interface behavior, and ARP cache contents.
-
-Each command below includes **context**, **interpretation**, and **details extracted from the screenshot**, not just surface-level descriptions.
 
 ---
 
-## IP Configuration  
+### IP Configuration  
 
 ```  
 ipconfig  
@@ -54,7 +52,7 @@ This command provides a quick diagnostic snapshot showing:
 ### What the screenshot reveals:
 
 - VM received an address in the `192.168.x.x` range.  
-- Default gateway is present and routing is active.  
+- Default gateway is present, meaning routing is active.  
 - Mask confirms standard `/24` network.
 
 This output immediately answers:
@@ -63,7 +61,7 @@ This output immediately answers:
 
 ---
 
-## Full Adapter Details  
+### Full Adapter Details  
 
 ```  
 ipconfig /all  
@@ -94,7 +92,7 @@ Useful when diagnosing DHCP or DNS conflicts.
 
 ---
 
-## Connectivity Tests  
+### Connectivity Tests  
 
 ```  
 ping 8.8.8.8  
@@ -115,7 +113,7 @@ Ping validates basic reachability and tests latency on the path.
 
 ---
 
-## Route Tracing  
+### Route Tracing  
 
 ```  
 tracert 8.8.8.8  
@@ -137,7 +135,7 @@ Common issues traceroute reveals:
 
 ---
 
-## ARP Table  
+### ARP Table  
 
 ```  
 arp -a  
@@ -154,7 +152,7 @@ arp -a
 
 ---
 
-# DHCP Failure Case Study (ipconfig /release & /renew)
+# DHCP Failure Case Study (ipconfig release and renew)
 
 This section demonstrates how virtualization settings impact real network behavior and why DHCP negotiation failed at first.
 
@@ -202,11 +200,11 @@ After the change + VM restart, the Windows Network Troubleshooter automatically 
 
 Release:
 
-<img width="521" height="186" alt="ipconfig release FI```ED" src="https://github.com/user-attachments/assets/592b4a19-cad5-4ce7-81a5-7fe4eb35a190" />
+<img width="521" height="186" alt="ipconfig release FIXED" src="https://github.com/user-attachments/assets/592b4a19-cad5-4ce7-81a5-7fe4eb35a190" />
 
 Renew:
 
-<img width="521" height="209" alt="ipconfig renew FI```ED" src="https://github.com/user-attachments/assets/620bddac-3fbd-4b82-baba-04014b9cd4df" />
+<img width="521" height="209" alt="ipconfig renew FIXED" src="https://github.com/user-attachments/assets/620bddac-3fbd-4b82-baba-04014b9cd4df" />
 
 This confirmed:
 
@@ -219,7 +217,7 @@ This confirmed:
 
 # Additional Windows Networking Tasks
 
-## MAC Address (getmac)
+### MAC Address (getmac)
 
 ```  
 getmac  
@@ -229,7 +227,7 @@ getmac
 
 ---
 
-## DNS Query (nslookup)
+### DNS Query (nslookup)
 
 ```  
 nslookup google.com  
@@ -244,6 +242,9 @@ Confirms:
 - No hijacking or redirection  
 
 # Ubuntu Networking Core Commands
+> These commands offer the Linux equivalent views into interface status, routing behavior, DNS resolution, and DHCP negotiation.
+
+Ubuntu provides similar networking tools to Windows, but uses Linux-native commands that reveal the same underlying network behavior from a different perspective.
 
 ### Interface Listing (ifconfig)  
 ```  
@@ -490,5 +491,6 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
 
