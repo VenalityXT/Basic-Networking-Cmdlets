@@ -362,45 +362,102 @@ sudo dhclient -v
 # Networking Theory (MAC, IP, DNS, DHCP, DORA)
 
 ## MAC Address  
+A **MAC address** (Media Access Control address) is a **48-bit hardware identifier** permanently assigned to a network interface card (NIC). It is written as **12 hexadecimal characters** (0–9, A–F), grouped into 6 pairs.
 
-> 48-bit burned-in hardware identifier.
+A MAC address is made of two halves:
+
+- **OUI (Organizationally Unique Identifier)**  
+  The first **24 bits** (first 3 bytes). This portion identifies the **manufacturer** of the NIC.
+
+- **NIC-Specific Identifier**  
+  The last **24 bits** (last 3 bytes). This is a **unique per-device value** assigned by the manufacturer when the interface is produced.
 
 ![MAC drawio](https://github.com/user-attachments/assets/a75c64f4-1dba-4f9f-a4aa-8abaf9a9ca11)
+
+MAC addresses operate at **OSI Layer 2 (Data Link)** and are used for frame delivery within a **local network (LAN)**. They do **not** pass across routers to other networks.
 
 ---
 
 ## IP Address  
+An **IPv4 address** is a **32-bit logical address** that identifies a device on a network. It is divided into **four octets** (0–255), such as:
 
-> Divided into **network** and **host** sections using the subnet mask.
+`192.168.1.25`
+
+An IP address contains:
+
+- **Network Portion**  
+  Identifies the network the device belongs to.  
+  Determined by the **subnet mask**, such as `255.255.255.0`.
+
+- **Host Portion**  
+  Identifies the **specific device** within that network.
 
 ![IP drawio](https://github.com/user-attachments/assets/35aa48b8-4865-40e1-b786-c3f99d2e3ba9)
+
+The subnet mask defines which part is network vs. host. For example:
+
+- Mask `255.255.255.0` → first three octets = network  
+- Mask `255.255.0.0` → first two octets = network  
+
+IPv4 operates at **OSI Layer 3 (Network)** and is routable across networks.
 
 ---
 
 ## DNS  
+**DNS (Domain Name System)** resolves **human-friendly names** into **IP addresses** so that hosts do not need to memorize numerical addresses.
 
-> Translates domain names into IP addresses.
+Example:
+
+- You type: `google.com`
+- DNS returns: `142.250.191.142`
+
+Basic resolution flow:
+
+1. Client queries its **DNS resolver**.
+2. Resolver checks cache; if not found, it queries:
+   - **Root DNS servers**
+   - **TLD servers** (such as `.com`)
+   - **Authoritative name server** for the domain
+3. The IP address is returned to the client.
+
+DNS operates on **UDP port 53** (and TCP 53 for larger transfers or zone transfers).
 
 ---
 
 ## DHCP  
+**DHCP (Dynamic Host Configuration Protocol)** automatically assigns network settings to devices so they do not need manual configuration.
 
-Assigns:
+DHCP provides:
 
-- IPv4  
-- Mask  
-- Gateway  
-- DNS  
-- Lease duration  
+- IPv4 Address  
+- Subnet Mask  
+- Default Gateway  
+- DNS Servers  
+- Lease Duration (how long the IP is valid)  
+- Additional options such as NTP, domain suffix, etc.
+
+DHCP uses **UDP ports 67 (server)** and **68 (client)**.
+
+This service is critical for scalable networks because it eliminates manual IP assignment and reduces configuration errors.
 
 ---
 
 ## DORA  
+**DORA** describes the four-step DHCP handshake between a client and the DHCP server:
 
-1. Discover  
-2. Offer  
-3. Request  
-4. Acknowledge  
+1. **Discover**  
+   The client broadcasts a DHCP Discover message to locate available DHCP servers.
+
+2. **Offer**  
+   A DHCP server responds with a DHCP Offer, proposing an IP address and network configuration.
+
+3. **Request**  
+   The client formally requests the offered settings from the server.
+
+4. **Acknowledge**  
+   The server sends a DHCP Acknowledgment, finalizing the lease and allowing the client to begin using the IP address.
+
+DORA ensures that each device receives a unique address and proper network configuration automatically.
 
 ---
 
@@ -420,6 +477,7 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
 
 
