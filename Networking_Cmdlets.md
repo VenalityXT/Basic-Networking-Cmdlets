@@ -336,7 +336,7 @@ sudo dhclient -v
 
 ## Hub (Layer 1)
 
-![Hub drawio](https://github.com/user-attachments/assets/ffbeb430-4a2e-443a-9aa7-5c6c10c68fea)
+![hub drawio](https://github.com/user-attachments/assets/e6acef97-6b0b-42b0-ab64-a9e4af38bca7)
 
 > A hub repeats *everything* to *everyone* — the “shouting in a room” device.
 
@@ -344,7 +344,7 @@ sudo dhclient -v
 
 ## Switch (Layer 2)
 
-![Switch drawio](https://github.com/user-attachments/assets/67ada540-a86c-4723-95cb-6011ff0851ac)
+![switch drawio](https://github.com/user-attachments/assets/b794f96e-45d7-491c-9184-c0ad3712f522)
 
 > A switch learns MAC addresses and forwards frames intelligently.
 
@@ -420,6 +420,7 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
 
 
