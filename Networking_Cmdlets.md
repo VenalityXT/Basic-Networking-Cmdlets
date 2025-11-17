@@ -355,7 +355,7 @@ sudo dhclient -v
 ![Router drawio](https://github.com/user-attachments/assets/23127bcf-8883-4e7f-88fc-df30d42f4f89)
 
 
-> The router connects your network to *other* networks — the “world beyond your neighborhood.”
+> The router connects your network to *other* networks.
 
 ---
 
@@ -420,6 +420,7 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
 
 
