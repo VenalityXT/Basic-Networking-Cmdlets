@@ -1,7 +1,7 @@
 # Basic Networking Command List  
 ### Cross-Platform Analysis of Windows & Ubuntu Networking Tools
 
-This document provides a structured walkthrough of essential networking utilities across **Windows** and **Ubuntu Linux**, blending practical command output with focused analysis of how each tool reveals the behavior of the underlying network stack. The goal is not just to *run* these commands, but to interpret what they show—addressing, routing, ARP resolution, DNS behavior, DHCP negotiation, and how virtualized environments impact all of it.
+This document provides a structured walkthrough of essential networking utilities across **Windows** and **Ubuntu Linux**, blending practical command output with focused analysis of how each tool reveals the behavior of the underlying network stack. The goal is not just to *run* these commands, but to interpret what they show: addressing, routing, ARP resolution, DNS behavior, DHCP negotiation, and how virtualized environments impact all of it.
 
 The document is organized for clarity, readability, and technical depth, using varied Markdown formatting to create a resource that is both visually engaging and practically informative.
 
@@ -54,7 +54,7 @@ This command provides a quick diagnostic snapshot showing:
 ### What the screenshot reveals:
 
 - VM received an address in the `192.168.x.x` range.  
-- Default gateway is present — routing is active.  
+- Default gateway is present and routing is active.  
 - Mask confirms standard `/24` network.
 
 This output immediately answers:
@@ -351,7 +351,7 @@ This is the go to command when a Linux host will not pull an address or when you
 
 ![hub drawio](https://github.com/user-attachments/assets/e6acef97-6b0b-42b0-ab64-a9e4af38bca7)
 
-> A hub repeats *everything* to *everyone* — the “shouting in a room” device.
+> A hub repeats *everything* to *everyone*; the “shouting in a room” device.
 
 ---
 
@@ -490,4 +490,5 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
