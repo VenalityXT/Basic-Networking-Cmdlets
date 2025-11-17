@@ -352,7 +352,8 @@ sudo dhclient -v
 
 ## Router (Layer 3)
 
-![Router drawio](https://github.com/user-attachments/assets/2f573cfa-99c1-4df6-a47e-ffecd8755aec)
+![Router drawio](https://github.com/user-attachments/assets/23127bcf-8883-4e7f-88fc-df30d42f4f89)
+
 
 > The router connects your network to *other* networks — the “world beyond your neighborhood.”
 
@@ -419,6 +420,7 @@ These tools are used constantly in enterprise networking work:
 This command set represents the **baseline operational toolkit** for system administration, enterprise networking, and Tier 1/2 SOC analysis.
 
 ---
+
 
 
 
